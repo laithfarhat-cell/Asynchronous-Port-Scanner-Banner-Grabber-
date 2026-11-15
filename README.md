@@ -13,6 +13,7 @@ services behind every open port and writes JSON / CSV / standalone HTML reports.
   <img alt="lint" src="https://img.shields.io/badge/lint-ruff%20clean-8a2be2">
   <img alt="docker" src="https://img.shields.io/badge/docker-multi--stage%20slim-2496ED?logo=docker&logoColor=white">
   <img alt="status" src="https://img.shields.io/badge/status-production--ready-informational">
+  <img alt="PR" src="https://img.shields.io/badge/PR-%231%20open-4aa8ff?logo=github">
 </p>
 
 ---
