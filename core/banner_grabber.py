@@ -193,6 +193,19 @@ class SignatureDatabase:
     def rule_ids(self) -> list[str]:
         return [rule_id for rule_id, _, _, _ in self._rules]
 
+    @property
+    def rules(self) -> list[dict[str, str | None]]:
+        """Serialisable view of the loaded rules (for UIs, docs and `/api` endpoints)."""
+        return [
+            {
+                "id": rule_id,
+                "service": service,
+                "pattern": pattern.pattern if pattern is not None else None,
+                "description": description,
+            }
+            for rule_id, pattern, service, description in self._rules
+        ]
+
     @classmethod
     def load(cls, path: os.PathLike[str] | str | None = None) -> SignatureDatabase:
         if path is not None:

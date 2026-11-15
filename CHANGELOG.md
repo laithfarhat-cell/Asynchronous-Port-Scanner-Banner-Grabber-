@@ -30,6 +30,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
   (non-root), `Makefile`, `.gitignore`, `.dockerignore`, `LICENSE`, `CHANGELOG.md`.
 - 141 tests covering parser, grabber, X.509 parsing, scanner semantics, exporters and CLI.
 
+### Developer tooling
+- `scripts/preview_server.py`: offline single-page console (demo findings, signature database,
+  port presets and CLI reference) bound to `0.0.0.0:32929` for workspace previews, plus
+  `/healthz`, `/api/signatures`, `/api/ports` and `/api/help`; `make preview`.
+- `examples/demo_report.{json,html}` committed samples so the console (and reviewers) work
+  without first running a scan.
+
 ### Known limitations
 - TCP only (`SYN`/UDP scanning is out of scope for the asyncio socket model).
 - A silent host is reported as `filtered` only when the connect attempt times out;

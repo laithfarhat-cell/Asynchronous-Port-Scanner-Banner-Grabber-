@@ -9,7 +9,7 @@ services behind every open port and writes JSON / CSV / standalone HTML reports.
   <img alt="license" src="https://img.shields.io/badge/license-MIT-3DDC84">
   <img alt="platform" src="https://img.shields.io/badge/platform-Linux%20%7C%20macOS%20%7C%20Windows-4aa8ff">
   <img alt="asyncio" src="https://img.shields.io/badge/asyncio-single--process-38e1b0">
-  <img alt="tests" src="https://img.shields.io/badge/tests-141%20passing-brightgreen">
+  <img alt="tests" src="https://img.shields.io/badge/tests-161%20passing-brightgreen">
   <img alt="lint" src="https://img.shields.io/badge/lint-ruff%20clean-8a2be2">
   <img alt="docker" src="https://img.shields.io/badge/docker-multi--stage%20slim-2496ED?logo=docker&logoColor=white">
   <img alt="status" src="https://img.shields.io/badge/status-production--ready-informational">
@@ -170,6 +170,20 @@ asynscan -t 10.0.0.0/24 -p 1-1024 -c 50 --delay 0.05 --jitter 0.1 --rate 20 --sh
 # 5) Silent hosts, hunting web ports on odd numbers
 asynscan -t 10.0.0.5 -p 1-10000 --aggressive -oH svc.html
 ```
+
+### Local preview console
+
+The repository ships a tiny offline console (`scripts/preview_server.py`) that renders the demo
+findings, the signature database and the CLI reference in the browser — handy for reviewing
+output without a terminal:
+
+```bash
+python3 scripts/demo_lab.py       # generate reports/demo.* from the loopback lab
+make preview                      # serve http://0.0.0.0:32929
+```
+
+It binds `0.0.0.0`, writes no files, makes no outbound requests, and falls back to the committed
+sample in `examples/demo_report.json` when no fresh report exists.
 
 ### Live terminal output
 
@@ -472,14 +486,17 @@ asynscan ... -c 2000
 ├── reporters/
 │   └── exporter.py             # JSON / CSV / standalone HTML
 ├── scripts/
-│   └── demo_lab.py             # loopback fake-service lab + sample reports
+│   ├── demo_lab.py             # loopback fake-service lab + sample reports
+│   └── preview_server.py       # offline console (demo findings · signatures · CLI help)
 ├── examples/
 │   ├── targets.txt             # annotated -iL example
-│   └── recipes.sh              # copy/paste scan profiles
+│   ├── recipes.sh              # copy/paste scan profiles
+│   ├── demo_report.html        # committed sample report (preview fallback)
+│   └── demo_report.json        # committed sample findings
 ├── docs/
 │   └── architecture.svg        # rendered pipeline diagram
 ├── .github/workflows/          # CI (3.10–3.13, lint, wheel, docker) + demo job
-└── tests/                      # 141 tests: parser, grabber, scanner, exporters, CLI
+└── tests/                      # 161 tests: parser, grabber, scanner, exporters, CLI, preview
 ```
 
 ---
@@ -488,7 +505,7 @@ asynscan ... -c 2000
 
 ```bash
 make dev            # venv + runtime & dev dependencies
-make test           # pytest (141 tests, ~13 s)
+make test           # pytest (161 tests, ~15 s)
 make lint           # ruff check
 make scan           # demo scan against loopback
 python3 scripts/demo_lab.py   # fake-service lab + reports/demo.{json,csv,html}
