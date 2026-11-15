@@ -55,6 +55,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
   so documentation examples are tracked while your own scan scopes stay private.
   `reports/` remains gitignored on purpose (generated findings).
 
+### Packaging (continued)
+- `reports/` now exists in a clean checkout: only `reports/README.md` is tracked
+  (documenting how output is generated, how to publish one deliberately, and
+  where the reviewed samples live). Generated findings stay ignored via
+  `reports/*` + `!reports/README.md`, so `-oA reports/scan` works out of the box.
+- `scripts/verify_clean_clone.sh` now fails only when *generated* files leak into
+  the export, instead of rejecting the directory outright.
+
 ### CI
 - Actions pinned to current majors (`checkout@v7`, `setup-python@v7`,
   `upload-artifact@v7`, `setup-buildx-action@v4`, `build-push-action@v7`) to clear the

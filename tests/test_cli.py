@@ -110,6 +110,14 @@ class TestEndToEnd:
         assert code == 0
         assert json.loads(out.read_text(encoding="utf-8"))["summary"]["open_ports"] == 1
 
+    def test_default_output_directory_exists_in_a_checkout(self):
+        """`-oA reports/x` must work without mkdir: the folder is tracked via a README."""
+        from pathlib import Path
+
+        reports = Path(__file__).resolve().parent.parent / "reports"
+        assert reports.is_dir(), "reports/ must exist (tracked README)"
+        assert (reports / "README.md").is_file()
+
     def test_report_dir_option(self, lab_thread, tmp_path):
         directory = tmp_path / "reports"
         code = main(["-t", "127.0.0.1", "-p", str(lab_thread.ports["ssh"]), "-oJ", "r.json",

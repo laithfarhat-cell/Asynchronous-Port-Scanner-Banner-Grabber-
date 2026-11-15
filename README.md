@@ -489,6 +489,7 @@ asynscan ... -c 2000
 │   └── paths.py                # bundled-data resolution (checkout, pip, Docker)
 ├── cli/
 │   └── interface.py            # argparse + rich UI + orchestration + SIGINT handling
+├── reports/                    # scan output (git-ignored; only its README is tracked)
 ├── reporters/
 │   └── exporter.py             # JSON / CSV / standalone HTML
 ├── scripts/

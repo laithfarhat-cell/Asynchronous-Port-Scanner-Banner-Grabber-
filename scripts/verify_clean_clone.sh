@@ -20,8 +20,15 @@ trap cleanup EXIT
 echo "==> exporting HEAD to $WORKDIR (git archive = exactly what CI checks out)"
 git -C "$REPO_ROOT" archive --format=tar HEAD | tar -x -C "$WORKDIR"
 
+# reports/ must exist in the export (its README is tracked) but contain no
+# generated findings: only that README may survive a clean checkout.
 if [[ -d "$WORKDIR/reports" ]]; then
-    echo "!! reports/ leaked into the export — check .gitignore (it must stay ignored)"; exit 1
+    leaked="$(find "$WORKDIR/reports" -type f ! -name 'README.md' -print)"
+    if [[ -n "$leaked" ]]; then
+        echo "!! generated reports leaked into the export:"; echo "$leaked"
+        echo "   check the reports/* rule in .gitignore"; exit 1
+    fi
+    echo "==> reports/ contains only its README (generated output excluded)"
 fi
 
 PYTHON="${PYTHON:-python3}"
@@ -33,7 +40,7 @@ echo "==> creating venv with $($PYTHON --version)"
 echo "==> ruff check"
 (cd "$WORKDIR" && .venv/bin/ruff check .)
 
-echo "==> pytest (clean tree, no reports/, no caches)"
+echo "==> pytest (clean tree, no generated reports, no caches)"
 (cd "$WORKDIR" && .venv/bin/python -m pytest -q --junitxml=pytest-report.xml)
 
 echo "==> entry point smoke test"
