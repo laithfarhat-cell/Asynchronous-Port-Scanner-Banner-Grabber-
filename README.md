@@ -180,7 +180,13 @@ output without a terminal:
 ```bash
 python3 scripts/demo_lab.py       # generate reports/demo.* from the loopback lab
 make preview                      # serve http://0.0.0.0:32929
+make check-preview                # is the running console up AND on the current build?
 ```
+
+`/healthz` reports the console build, its start time and which report it is serving.
+Because a long-running preview keeps its module in memory, a stale process would silently
+serve old HTML — `scripts/check_preview.py` compares the running build with the on-disk one
+and exits non-zero on a mismatch (or when nothing is listening).
 
 It binds `0.0.0.0`, writes no files, makes no outbound requests, and falls back to the committed
 sample in `examples/demo_report.json` when no fresh report exists.
@@ -487,7 +493,8 @@ asynscan ... -c 2000
 │   └── exporter.py             # JSON / CSV / standalone HTML
 ├── scripts/
 │   ├── demo_lab.py             # loopback fake-service lab + sample reports
-│   └── preview_server.py       # offline console (demo findings · signatures · CLI help)
+│   ├── preview_server.py       # offline console (demo findings · signatures · CLI help)
+│   └── check_preview.py        # fails when the console is down or serving a stale build
 ├── examples/
 │   ├── targets.txt             # annotated -iL example
 │   ├── recipes.sh              # copy/paste scan profiles

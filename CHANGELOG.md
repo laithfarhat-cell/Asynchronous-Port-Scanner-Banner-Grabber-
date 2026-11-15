@@ -36,6 +36,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
   `/healthz`, `/api/signatures`, `/api/ports` and `/api/help`; `make preview`.
 - `examples/demo_report.{json,html}` committed samples so the console (and reviewers) work
   without first running a scan.
+- Console build identity: the page and `/healthz` expose `console_build` and `started_at`, and
+  `scripts/check_preview.py` (`make check-preview`) fails when a running preview serves a stale
+  build or nothing is listening.
 
 ### Known limitations
 - TCP only (`SYN`/UDP scanning is out of scope for the asyncio socket model).

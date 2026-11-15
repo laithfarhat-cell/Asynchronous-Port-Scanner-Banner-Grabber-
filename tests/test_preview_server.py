@@ -14,6 +14,7 @@ from http.server import ThreadingHTTPServer
 import pytest
 
 from scripts.preview_server import (
+    CONSOLE_BUILD,
     PreviewHandler,
     active_json,
     active_report,
@@ -59,6 +60,12 @@ class TestRender:
         assert "ssh-openssh" in html or "http-nginx" in html  # signature table
         assert "127.0.0.1" in html            # demo findings
 
+    def test_page_exposes_its_build(self):
+        """The rendered page must identify its build so a stale process is visible."""
+        html = render_index()
+        assert f"build {CONSOLE_BUILD}" in html
+        assert "{build}" not in html and "{started}" not in html
+
     def test_report_sources_resolve(self):
         assert active_report() is not None and active_report().is_file()
         assert active_json() is not None and active_json().is_file()
@@ -82,7 +89,12 @@ class TestRoutes:
         status, body, ctype = get(base_url + "/healthz")
         payload = json.loads(body)
         assert status == 200 and "application/json" in ctype
-        assert payload["status"] == "ok" and payload["report"]
+        assert payload["status"] == "ok"
+        # Identity fields are what make a stale process detectable.
+        assert payload["console_build"] == CONSOLE_BUILD
+        assert payload["started_at"]
+        assert payload["report"] and payload["data"]
+        assert payload["report"].endswith(".html") and payload["data"].endswith(".json")
 
     def test_signature_api_matches_database(self, base_url):
         import json
