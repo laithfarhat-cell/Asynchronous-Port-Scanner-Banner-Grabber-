@@ -1,0 +1,130 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 700" width="1100" height="700" role="img" aria-label="asynscan architecture flow">
+  <defs>
+    <style>
+      .bg { fill: #0b0f14; }
+      .grid { stroke: #16222e; stroke-width: 1; }
+      .box { fill: #121821; stroke: #22303f; stroke-width: 1.5; rx: 12; }
+      .box-accent { fill: #10202a; stroke: #38e1b0; stroke-width: 1.6; rx: 12; }
+      .box-alt { fill: #101a26; stroke: #4aa8ff; stroke-width: 1.6; rx: 12; }
+      .title { fill: #d7e2ee; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 15px; font-weight: 600; }
+      .sub { fill: #8aa0b4; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 11.5px; }
+      .mono { fill: #a6bccf; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 11px; }
+      .accent { fill: #38e1b0; }
+      .blue { fill: #4aa8ff; }
+      .arrow { stroke: #38e1b0; stroke-width: 1.6; fill: none; marker-end: url(#arrowhead); }
+      .arrow-blue { stroke: #4aa8ff; stroke-width: 1.6; fill: none; marker-end: url(#arrowhead-blue); }
+      .arrow-dim { stroke: #46617a; stroke-width: 1.4; fill: none; marker-end: url(#arrowhead-dim); stroke-dasharray: 5 4; }
+      .label { fill: #6e869c; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 10.5px; }
+    </style>
+    <marker id="arrowhead" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#38e1b0"/>
+    </marker>
+    <marker id="arrowhead-blue" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#4aa8ff"/>
+    </marker>
+    <marker id="arrowhead-dim" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#46617a"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" width="1100" height="700"/>
+  <g opacity="0.55">
+    <path class="grid" d="M0 60 H1100 M0 140 H1100 M0 220 H1100 M0 300 H1100 M0 380 H1100 M0 460 H1100 M0 540 H1100 M0 620 H1100"/>
+    <path class="grid" d="M80 0 V700 M240 0 V700 M400 0 V700 M560 0 V700 M720 0 V700 M880 0 V700 M1020 0 V700"/>
+  </g>
+
+  <text x="34" y="42" class="title" font-size="20">asynscan — <tspan class="accent">asynchronous</tspan> reconnaissance pipeline</text>
+  <text x="34" y="64" class="sub">single process · one event loop · semaphore-bounded sockets</text>
+
+  <!-- CLI -->
+  <rect class="box-alt" x="34" y="92" width="300" height="112"/>
+  <text x="52" y="118" class="title">cli/interface.py</text>
+  <text x="52" y="140" class="mono">argparse → plan table → live UI</text>
+  <text x="52" y="158" class="mono">rich Live: progress, ETA, findings</text>
+  <text x="52" y="176" class="mono">SIGINT/SIGTERM → graceful cancel</text>
+  <text x="52" y="194" class="label">entry point: console script "asynscan"</text>
+
+  <!-- Parser -->
+  <rect class="box" x="400" y="92" width="300" height="112"/>
+  <text x="418" y="118" class="title">core/parser.py</text>
+  <text x="418" y="140" class="mono">-t / -iL · IPv4 · IPv6 · CIDR</text>
+  <text x="418" y="158" class="mono">getaddrinfo (A + AAAA, async)</text>
+  <text x="418" y="176" class="mono">-p specs · --top-ports 100/1000</text>
+  <text x="418" y="194" class="label">ipaddress · max-hosts guard rails</text>
+
+  <!-- data -->
+  <rect class="box" x="766" y="92" width="300" height="112"/>
+  <text x="784" y="118" class="title">data/</text>
+  <text x="784" y="140" class="mono">signatures.json — 57 regex rules</text>
+  <text x="784" y="158" class="mono">top_ports.json — 100 / 1000 presets</text>
+  <text x="784" y="176" class="mono">custom DB via --signatures</text>
+  <text x="784" y="194" class="label">shipped as package data-files</text>
+
+  <path class="arrow-blue" d="M334 148 H396"/>
+  <text x="338" y="140" class="label">specs</text>
+  <path class="arrow-blue" d="M150 204 V244"/>
+  <text x="158" y="230" class="label">on_open · on_progress</text>
+
+  <!-- Scanner -->
+  <rect class="box-accent" x="34" y="248" width="666" height="150"/>
+  <text x="52" y="276" class="title">core/scanner.py — AsyncScanner</text>
+  <text x="52" y="300" class="mono">asyncio.Semaphore(concurrency)   ← clamped to RLIMIT_NOFILE</text>
+  <text x="52" y="320" class="mono">asyncio.wait_for(open_connection(ip, port), timeout)</text>
+  <text x="52" y="340" class="mono">RateLimiter: token bucket + fixed delay + jitter</text>
+  <text x="52" y="360" class="mono">states: open · closed · filtered   |   EMFILE → global back-off</text>
+  <text x="52" y="382" class="label">1 coroutine per (host, port) — 5k–7k probes/s on 2 vCPU</text>
+
+  <path class="arrow" d="M540 204 V244"/>
+  <text x="548" y="230" class="label">targets × ports</text>
+
+  <!-- Deep worker (nested) -->
+  <rect class="box" x="596" y="268" width="86" height="110" opacity="0.85"/>
+  <text x="608" y="292" class="title" font-size="12">worker</text>
+  <text x="608" y="310" class="mono" font-size="10">connect</text>
+  <text x="608" y="326" class="mono" font-size="10">grab</text>
+  <text x="608" y="342" class="mono" font-size="10">record</text>
+  <text x="608" y="362" class="label">finally:</text>
+  <text x="608" y="374" class="label">close()</text>
+
+  <!-- Grabber -->
+  <rect class="box" x="34" y="438" width="470" height="222"/>
+  <text x="52" y="466" class="title">core/banner_grabber.py</text>
+  <text x="52" y="490" class="mono">1 · passive greeting (SSH, FTP, SMTP, MySQL, VNC)</text>
+  <text x="52" y="510" class="mono">2 · active probes</text>
+  <text x="52" y="528" class="label">   HTTP/HTTPS HEAD · Redis PING+INFO · Memcached VERSION</text>
+  <text x="52" y="544" class="label">   PostgreSQL SSLRequest · SMTP EHLO · RDP/SMB negotiate</text>
+  <text x="52" y="564" class="mono">3 · TLS handshake (CERT_NONE, opportunistic upgrade)</text>
+  <text x="52" y="584" class="mono">4 · regex match → service / product / version</text>
+  <text x="52" y="612" class="label">--no-banner = connect only · --aggressive = multi-protocol spray</text>
+  <text x="52" y="632" class="label">failures never downgrade an open port</text>
+
+  <!-- X509 -->
+  <rect class="box-alt" x="540" y="438" width="262" height="100"/>
+  <text x="558" y="464" class="title">core/x509.py</text>
+  <text x="558" y="486" class="mono">DER/ASN.1 reader (no deps)</text>
+  <text x="558" y="504" class="mono">CN · SANs · issuer · validity</text>
+  <text x="558" y="522" class="label">key type/bits · SHA-256 · self-signed</text>
+
+  <path class="arrow" d="M296 398 V434"/>
+  <text x="306" y="420" class="label">PortResult</text>
+  <path class="arrow-blue" d="M540 494 H508"/>
+
+  <!-- Reporters -->
+  <rect class="box-accent" x="838" y="438" width="228" height="222"/>
+  <text x="856" y="466" class="title">reporters/exporter.py</text>
+  <text x="856" y="492" class="mono">JSON · schema v1</text>
+  <text x="856" y="512" class="label">   metadata + summary + hosts</text>
+  <text x="856" y="536" class="mono">CSV · 14 flat columns</text>
+  <text x="856" y="556" class="label">   spreadsheet / pandas ready</text>
+  <text x="856" y="580" class="mono">HTML · one self-contained file</text>
+  <text x="856" y="600" class="label">   dark UI · search · filter · sort</text>
+  <text x="856" y="616" class="label">   zero CDN · values escaped</text>
+  <text x="856" y="642" class="label">atomic writes (temp + os.replace)</text>
+
+  <path class="arrow-dim" d="M818 430 V210"/>
+  <text x="826" y="330" class="label" transform="rotate(90 826 330)">signatures.json</text>
+  <path class="arrow" d="M504 604 H830"/>
+  <text x="606" y="596" class="label">findings (PortResult)</text>
+
+  <text x="34" y="684" class="sub">outputs: asynscan.json · asynscan.csv · asynscan.html — plus exit code 130 with partial reports when interrupted</text>
+</svg>

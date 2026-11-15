@@ -1,0 +1,80 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "asynscan"
+version = "1.0.0"
+description = "High-speed asynchronous port scanner, banner grabber and TLS certificate inspector"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Laith Farhat", email = "laith.farhat@example.com" }]
+keywords = ["security", "recon", "port-scanner", "asyncio", "banner-grabber", "tls", "pentest"]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Environment :: Console",
+  "Intended Audience :: Information Technology",
+  "Intended Audience :: System Administrators",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Security",
+  "Topic :: System :: Networking",
+  "Topic :: System :: Systems Administration",
+]
+dependencies = [
+  "rich>=13.7",
+  "aiofiles>=23.2",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0",
+  "pytest-asyncio>=0.23",
+  "ruff>=0.5",
+]
+
+[project.urls]
+Homepage = "https://github.com/laithfarhat-cell/Asynchronous-Port-Scanner-Banner-Grabber-"
+Repository = "https://github.com/laithfarhat-cell/Asynchronous-Port-Scanner-Banner-Grabber-"
+Issues = "https://github.com/laithfarhat-cell/Asynchronous-Port-Scanner-Banner-Grabber-/issues"
+Changelog = "https://github.com/laithfarhat-cell/Asynchronous-Port-Scanner-Banner-Grabber-/blob/main/CHANGELOG.md"
+
+[project.scripts]
+asynscan = "cli.interface:main"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["core*", "cli*", "reporters*"]
+exclude = ["tests*", "build*", "dist*"]
+
+[tool.setuptools.data-files]
+"share/asynscan" = ["data/signatures.json", "data/top_ports.json"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+pythonpath = ["."]
+filterwarnings = ["ignore::DeprecationWarning"]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 110
+extend-exclude = [".venv", "build", "dist"]
+
+[tool.ruff.lint]
+# Modernising annotations (UP006/UP045) is intentionally on: runtime behaviour is
+# unaffected thanks to ``from __future__ import annotations``.
+select = ["E", "F", "W", "I", "UP", "B", "C4", "SIM"]
+ignore = ["E501", "SIM108", "SIM105"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["B011", "S101"]

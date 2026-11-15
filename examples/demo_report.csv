@@ -1,0 +1,6 @@
+timestamp,ip,hostname,port,protocol,state,service,product,version,banner,tls_cn,tls_issuer,tls_expires,latency_ms
+2026-11-15T18:44:58+00:00,127.0.0.1,localhost,33879,tcp,open,unknown,,,,,,,1.77
+2026-11-15T18:44:58+00:00,127.0.0.1,localhost,38721,tcp,open,OpenSSH/9.6p1,OpenSSH,9.6p1,SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.5,,,,1.71
+2026-11-15T18:44:58+00:00,127.0.0.1,localhost,43417,tcp,open,nginx/1.24.0,nginx,1.24.0,HTTP/1.1 200 OK | Server: nginx/1.24.0 | X-Powered-By: PHP/8.2.1 | Content-Length: 0 | Connection: close,demo.asynscan.local,demo.asynscan.local,2026-12-15T18:44:58+00:00,1.70
+2026-11-15T18:44:58+00:00,127.0.0.1,localhost,46119,tcp,open,nginx/1.24.0,nginx,1.24.0,HTTP/1.1 200 OK | Server: nginx/1.24.0 | X-Powered-By: PHP/8.2.1 | Content-Length: 0 | Connection: close,,,,1.69
+2026-11-15T18:44:58+00:00,127.0.0.1,localhost,46753,tcp,open,redis,,,+PONG,,,,1.69
