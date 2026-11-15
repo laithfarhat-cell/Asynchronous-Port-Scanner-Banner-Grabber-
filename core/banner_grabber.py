@@ -391,6 +391,11 @@ class BannerGrabber:
                 chunk = await asyncio.wait_for(reader.read(min(4096, limit - total)), timeout=remaining)
             except (asyncio.TimeoutError, TimeoutError):
                 break
+            except (ConnectionError, OSError):
+                # RST mid-read (peer aborted, closed with unread data, or a
+                # firewall injected a reset). Whatever arrived before it is
+                # still valid evidence: keep it and stop reading.
+                break
             if not chunk:
                 break
             chunks.append(chunk)
@@ -489,6 +494,27 @@ class BannerGrabber:
         re-connected with an SSL context; everything else reuses the existing
         connection so connect latency is only paid once.
         """
+        try:
+            return await self._grab(ip, port, hostname, reader, writer)
+        except asyncio.CancelledError:
+            raise
+        except (ConnectionError, OSError) as exc:
+            # A reset while probing is normal on real networks (and on servers
+            # that close immediately after writing). The port is open: report
+            # what we know plus the reason, never raise at the caller.
+            return GrabResult(
+                service=guess_service(port),
+                error=f"connection lost during grab: {exc.strerror or exc}",
+            )
+
+    async def _grab(
+        self,
+        ip: str,
+        port: int,
+        hostname: str | None,
+        reader: asyncio.StreamReader | None,
+        writer: asyncio.StreamWriter | None,
+    ) -> GrabResult:
         result = GrabResult(service=guess_service(port))
         if not self.active_probes:
             raw = await self._read_banner(reader) if reader is not None else b""

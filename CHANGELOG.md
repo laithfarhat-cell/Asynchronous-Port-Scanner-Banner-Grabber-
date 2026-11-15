@@ -40,6 +40,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
   `scripts/check_preview.py` (`make check-preview`) fails when a running preview serves a stale
   build or nothing is listening.
 
+### Fixed
+- Banner grabbing no longer raises when a peer resets the connection mid-read
+  (`ConnectionResetError` / `ECONNRESET`). Partial data is kept and fingerprinted,
+  the reason is recorded as `error`, and the port stays `open` — previously this
+  escaped `BannerGrabber.grab()` and only survived because the scanner wrapped it.
+  Found by CI on Python 3.12/3.13 (faster I/O changes the close/RST race).
+- `tests/conftest.py` fixture servers now keep connections open long enough for a
+  clean EOF, instead of racing the client into a reset.
+
 ### Known limitations
 - TCP only (`SYN`/UDP scanning is out of scope for the asyncio socket model).
 - A silent host is reported as `filtered` only when the connect attempt times out;

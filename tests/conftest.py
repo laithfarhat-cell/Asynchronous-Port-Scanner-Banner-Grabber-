@@ -32,8 +32,10 @@ async def _ssh_handler(reader: asyncio.StreamReader, writer: asyncio.StreamWrite
     writer.write(SSH_BANNER)
     await writer.drain()
     with contextlib.suppress(ConnectionError):
-        await asyncio.sleep(0.5)
+        await asyncio.sleep(2.0)
         writer.close()
+        with contextlib.suppress(ConnectionError):
+            await writer.wait_closed()
 
 
 async def _http_handler(reader: asyncio.StreamReader, writer: asyncio.StreamWriter) -> None:
@@ -58,9 +60,17 @@ async def _redis_handler(reader: asyncio.StreamReader, writer: asyncio.StreamWri
 
 
 async def _silent_handler(reader: asyncio.StreamReader, writer: asyncio.StreamWriter) -> None:
+    """Never greet, never reset: hold the connection, then close cleanly.
+
+    The close must happen far enough in the future that the *client* closes first
+    on fast interpreters (3.12/3.13); otherwise the peer close races the reader
+    and turns into ECONNRESET instead of a clean EOF.
+    """
     with contextlib.suppress(ConnectionError):
-        await asyncio.sleep(0.5)
+        await asyncio.sleep(2.0)
         writer.close()
+        with contextlib.suppress(ConnectionError):
+            await writer.wait_closed()
 
 
 @pytest.fixture(scope="session")
@@ -198,6 +208,16 @@ def cert_der(cert_files: tuple[Path, Path]) -> bytes:
     from core.x509 import decode_pem
 
     return decode_pem(cert_files[0].read_bytes())
+
+
+@pytest.fixture
+def unused_tcp_port() -> int:
+    """Reserve a currently-free loopback port (released before the test binds)."""
+    import socket
+
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+        sock.bind(("127.0.0.1", 0))
+        return sock.getsockname()[1]
 
 
 async def unused_port() -> int:

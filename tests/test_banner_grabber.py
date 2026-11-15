@@ -217,6 +217,68 @@ class TestLiveGrabbing:
         writer.close()
         assert result.tls is None
 
+    async def test_connection_reset_mid_banner_is_not_fatal(self, unused_tcp_port):
+        """Servers that abort after writing must not raise or lose the banner.
+
+        A RST arrives instead of a FIN whenever the peer closes with unread data
+        in its buffer (or a middlebox injects a reset). Python 3.12/3.13 hit this
+        on CI while 3.11 did not, because the client closed at a different point.
+        """
+        import socket
+        import struct
+
+        async def aborting_server(reader, writer):
+            writer.write(b"SSH-2.0-OpenSSH_9.9\r\n")
+            await writer.drain()
+            sock = writer.get_extra_info("socket")
+            if sock is not None:
+                sock.setsockopt(socket.SOL_SOCKET, socket.SO_LINGER, struct.pack("ii", 1, 0))
+            writer.transport.abort()  # force RST before the peer reads
+
+        server = await asyncio.start_server(aborting_server, "127.0.0.1", unused_tcp_port)
+        grabber = BannerGrabber(timeout=1.0, banner_timeout=0.4)
+        try:
+            reader, writer = await asyncio.open_connection("127.0.0.1", unused_tcp_port)
+            result = await grabber.grab("127.0.0.1", unused_tcp_port, reader=reader, writer=writer)
+            writer.close()
+        finally:
+            server.close()
+            await server.wait_closed()
+        # Either the bytes arrived (fingerprinted) or the reset was recorded —
+        # never an exception, and never a silent loss of evidence.
+        assert result.product == "OpenSSH" or result.error
+        assert result.service == "ssh"
+
+    async def test_scanner_keeps_open_state_when_grab_resets(self, unused_tcp_port):
+        """A reset during fingerprinting must not downgrade an open port."""
+        import socket
+        import struct
+
+        from core.parser import Target
+        from core.scanner import ScanSettings, scan
+
+        async def aborting_server(reader, writer):
+            writer.write(b"garbage\r\n")
+            await writer.drain()
+            sock = writer.get_extra_info("socket")
+            if sock is not None:
+                sock.setsockopt(socket.SOL_SOCKET, socket.SO_LINGER, struct.pack("ii", 1, 0))
+            writer.transport.abort()
+
+        server = await asyncio.start_server(aborting_server, "127.0.0.1", unused_tcp_port)
+        try:
+            result = await scan(
+                [Target(ip="127.0.0.1")],
+                [unused_tcp_port],
+                ScanSettings(timeout=1.0, banner_timeout=0.3),
+            )
+        finally:
+            server.close()
+            await server.wait_closed()
+        port = result.hosts[0].ports[0]
+        assert port.state == "open"
+        assert result.total_open == 1
+
     async def test_no_active_probes_means_passive_only(self, lab):
         grabber = BannerGrabber(timeout=2.0, banner_timeout=0.4, active_probes=False)
         port = lab.ports["ssh"]
