@@ -49,6 +49,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 - `tests/conftest.py` fixture servers now keep connections open long enough for a
   clean EOF, instead of racing the client into a reset.
 
+### Fixed (packaging)
+- `examples/targets.txt` was accidentally excluded by the `.gitignore` rule meant
+  for local target lists; the rule is now anchored to the repo root (`/targets.txt`)
+  so documentation examples are tracked while your own scan scopes stay private.
+  `reports/` remains gitignored on purpose (generated findings).
+
 ### CI
 - Actions pinned to current majors (`checkout@v7`, `setup-python@v7`,
   `upload-artifact@v7`, `setup-buildx-action@v4`, `build-push-action@v7`) to clear the

@@ -1,0 +1,19 @@
+# asynscan target list — one entry per line.
+# Lines starting with '#' (and inline '# comments') are ignored.
+# IPs, IPv6, CIDR networks and hostnames (resolved to A + AAAA) are supported.
+
+# --- loopback / lab -------------------------------------------------------
+127.0.0.1
+::1
+
+# --- private ranges (use CIDR carefully; /16 = 65,534 probes per port) ----
+# 10.0.0.0/24
+# 172.16.0.0/28
+# 192.168.1.0/24
+
+# --- hostnames ------------------------------------------------------------
+# example.com
+# internal.corp.example
+
+# --- inline comments work too --------------------------------------------
+# 10.10.10.5        # legacy NAS, owner: infra team
