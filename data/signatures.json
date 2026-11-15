@@ -1,0 +1,348 @@
+{
+  "version": "1.0.0",
+  "description": "Lightweight regex fingerprint database. Each entry is matched against a decoded banner. Named groups `product` and `version` are extracted when present; `service` overrides the port-derived guess.",
+  "signatures": [
+    {
+      "id": "mysql-mariadb",
+      "service": "mysql",
+      "pattern": "(?i)(?P<version>\\d+\\.\\d+\\.\\d+[\\w.+~]*)-(?P<product>MariaDB)",
+      "description": "MariaDB handshake (matched before generic MySQL)"
+    },
+    {
+      "id": "ssh-openssh",
+      "service": "ssh",
+      "pattern": "^SSH-[\\d.]+-(?P<product>OpenSSH)[_-](?P<version>[\\w.]+)",
+      "description": "OpenSSH server"
+    },
+    {
+      "id": "ssh-dropbear",
+      "service": "ssh",
+      "pattern": "^SSH-[\\d.]+-(?P<product>dropbear)[_-]?(?P<version>[\\w.]*)?",
+      "description": "Dropbear SSH"
+    },
+    {
+      "id": "ssh-cisco",
+      "service": "ssh",
+      "pattern": "^SSH-[\\d.]+-(?P<product>Cisco)[\\w.-]*",
+      "description": "Cisco IOS SSH"
+    },
+    {
+      "id": "ssh-libssh",
+      "service": "ssh",
+      "pattern": "^SSH-[\\d.]+-(?P<product>libssh)[_-]?(?P<version>[\\w.-]*)?",
+      "description": "libssh"
+    },
+    {
+      "id": "ssh-sun",
+      "service": "ssh",
+      "pattern": "^SSH-[\\d.]+-(?P<product>Sun_SSH)[\\w.-]*",
+      "description": "Oracle/Sun SSH"
+    },
+    {
+      "id": "ssh-banner-generic",
+      "service": "ssh",
+      "pattern": "^SSH-(?P<proto>[\\d.]+)-(?P<product>[\\w.-]+?)(?:[_\\s-](?P<version>[\\w.]+))?(?:\\s+(?P<extra>.*))?$",
+      "description": "Generic SSH identification string"
+    },
+    {
+      "id": "ftp-vsftpd",
+      "service": "ftp",
+      "pattern": "(?i)(?P<product>vsFTPd)\\s+(?P<version>[\\d.]+)?",
+      "description": "vsFTPd"
+    },
+    {
+      "id": "ftp-proftpd",
+      "service": "ftp",
+      "pattern": "(?i)(?P<product>ProFTPD)\\s+(?P<version>[\\d.]+)?",
+      "description": "ProFTPD"
+    },
+    {
+      "id": "ftp-pureftpd",
+      "service": "ftp",
+      "pattern": "(?i)(?P<product>Pure-FTPd)",
+      "description": "Pure-FTPd"
+    },
+    {
+      "id": "ftp-filezilla",
+      "service": "ftp",
+      "pattern": "(?i)(?P<product>FileZilla)\\s*Server\\s*(?P<version>[\\d.]+)?",
+      "description": "FileZilla Server"
+    },
+    {
+      "id": "ftp-python-pyftpdlib",
+      "service": "ftp",
+      "pattern": "(?i)(?P<product>pyftpdlib)\\s*(?P<version>[\\d.]+)?",
+      "description": "Python pyftpdlib"
+    },
+    {
+      "id": "ftp-banner-generic",
+      "service": "ftp",
+      "pattern": "^220[ -].*(?P<product>FTP)",
+      "description": "Generic FTP service ready banner"
+    },
+    {
+      "id": "smtp-postfix",
+      "service": "smtp",
+      "pattern": "(?i)(?P<product>Postfix)(?:\\s+ESMTP)?(?:.*?Debian)?",
+      "description": "Postfix MTA"
+    },
+    {
+      "id": "smtp-exim",
+      "service": "smtp",
+      "pattern": "(?i)(?P<product>Exim)\\s+(?P<version>[\\d.]+)?",
+      "description": "Exim MTA"
+    },
+    {
+      "id": "smtp-exchange",
+      "service": "smtp",
+      "pattern": "(?i)(?P<product>Microsoft)\\s+(?P<version>Exchange[^\\r\\n]*)",
+      "description": "Microsoft Exchange"
+    },
+    {
+      "id": "smtp-sendmail",
+      "service": "smtp",
+      "pattern": "(?i)(?P<product>Sendmail)\\s+(?P<version>[\\d.]+)?",
+      "description": "Sendmail"
+    },
+    {
+      "id": "smtp-opensmtpd",
+      "service": "smtp",
+      "pattern": "(?i)(?P<product>OpenSMTPD)\\s*(?P<version>[\\d.]*)?",
+      "description": "OpenSMTPD"
+    },
+    {
+      "id": "pop3-dovecot",
+      "service": "pop3",
+      "pattern": "(?i)(?P<product>Dovecot)(?:\\s+ready)?(?:.*?(?P<version>[\\d.]+))?",
+      "description": "Dovecot POP3"
+    },
+    {
+      "id": "pop3-courier",
+      "service": "pop3",
+      "pattern": "(?i)(?P<product>Courier)(?:\\s+IMAP/POP3)?(?:\\s+server)?",
+      "description": "Courier POP3"
+    },
+    {
+      "id": "imap-dovecot",
+      "service": "imap",
+      "pattern": "(?i)\\*\\s+OK.*(?P<product>Dovecot)(?:\\s+ready)?",
+      "description": "Dovecot IMAP"
+    },
+    {
+      "id": "imap-cyrus",
+      "service": "imap",
+      "pattern": "(?i)\\*\\s+OK.*(?P<product>Cyrus)",
+      "description": "Cyrus IMAP"
+    },
+    {
+      "id": "http-nginx",
+      "service": "http",
+      "pattern": "(?i)^(?:HTTP/[\\d.]+\\s+\\d{3}.*?)?Server:\\s*(?P<product>nginx)(?:/(?P<version>[\\d.]+))?",
+      "description": "nginx"
+    },
+    {
+      "id": "http-apache",
+      "service": "http",
+      "pattern": "(?i)^(?:HTTP/[\\d.]+\\s+\\d{3}.*?)?Server:\\s*(?P<product>Apache)(?:/(?P<version>[\\d.]+))?",
+      "description": "Apache httpd"
+    },
+    {
+      "id": "http-apache-tomcat",
+      "service": "http",
+      "pattern": "(?i)(?P<product>Apache-Coyote|Tomcat)(?:/(?P<version>[\\d.]+))?",
+      "description": "Apache Tomcat / Coyote"
+    },
+    {
+      "id": "http-iis",
+      "service": "http",
+      "pattern": "(?i)Server:\\s*(?P<product>Microsoft-IIS)/(?P<version>[\\d.]+)",
+      "description": "Microsoft IIS"
+    },
+    {
+      "id": "http-caddy",
+      "service": "http",
+      "pattern": "(?i)Server:\\s*(?P<product>Caddy)",
+      "description": "Caddy web server"
+    },
+    {
+      "id": "http-envoy",
+      "service": "http",
+      "pattern": "(?i)Server:\\s*(?P<product>envoy)",
+      "description": "Envoy proxy"
+    },
+    {
+      "id": "http-lighttpd",
+      "service": "http",
+      "pattern": "(?i)Server:\\s*(?P<product>lighttpd)/(?P<version>[\\d.]+)",
+      "description": "lighttpd"
+    },
+    {
+      "id": "http-gunicorn",
+      "service": "http",
+      "pattern": "(?i)Server:\\s*(?P<product>gunicorn)(?:/(?P<version>[\\d.]+))?",
+      "description": "Gunicorn WSGI server"
+    },
+    {
+      "id": "http-werkzeug",
+      "service": "http",
+      "pattern": "(?i)Server:\\s*(?P<product>Werkzeug)(?:/(?P<version>[\\d.and]+))?",
+      "description": "Werkzeug (Flask) development server"
+    },
+    {
+      "id": "http-golang",
+      "service": "http",
+      "pattern": "(?i)Server:\\s*(?P<product>Go-http-client|GoAhead)",
+      "description": "Go standard library HTTP server"
+    },
+    {
+      "id": "http-jetty",
+      "service": "http",
+      "pattern": "(?i)Server:\\s*(?P<product>Jetty)\\((?P<version>[\\d.]+)",
+      "description": "Eclipse Jetty"
+    },
+    {
+      "id": "http-varnish",
+      "service": "http",
+      "pattern": "(?i)Via:.*(?P<product>varnish)",
+      "description": "Varnish cache"
+    },
+    {
+      "id": "http-cloudflare",
+      "service": "http",
+      "pattern": "(?i)Server:\\s*(?P<product>cloudflare)",
+      "description": "Cloudflare edge"
+    },
+    {
+      "id": "http-python-simple",
+      "service": "http",
+      "pattern": "(?i)Server:\\s*(?P<product>SimpleHTTP)/(?P<version>[\\d.]+)",
+      "description": "Python SimpleHTTPServer"
+    },
+    {
+      "id": "http-powered-php",
+      "service": "http",
+      "pattern": "(?i)X-Powered-By:\\s*(?:PHP/)?(?P<product>PHP)/(?P<version>[\\d.]+)",
+      "description": "PHP runtime"
+    },
+    {
+      "id": "http-powered-express",
+      "service": "http",
+      "pattern": "(?i)X-Powered-By:\\s*(?P<product>Express)",
+      "description": "Express.js"
+    },
+    {
+      "id": "http-powered-aspnet",
+      "service": "http",
+      "pattern": "(?i)X-Powered-By:\\s*(?P<product>ASP\\.NET)",
+      "description": "ASP.NET"
+    },
+    {
+      "id": "http-powered-servlet",
+      "service": "http",
+      "pattern": "(?i)X-Powered-By:\\s*(?P<product>Servlet)/(?P<version>[\\d.]+)",
+      "description": "Java Servlet container"
+    },
+    {
+      "id": "http-status-line",
+      "service": "http",
+      "pattern": "^(?P<product>HTTP)/(?P<version>[\\d.]+)\\s+(?P<status>\\d{3})\\s*(?P<reason>[^\\r\\n]*)",
+      "description": "HTTP status line (fallback)"
+    },
+    {
+      "id": "tls-openssl",
+      "service": "tls",
+      "pattern": "(?i)(?P<product>OpenSSL)/(?P<version>[\\w.]+)",
+      "description": "OpenSSL library"
+    },
+    {
+      "id": "mysql",
+      "service": "mysql",
+      "pattern": "(?i)(?:mysql|(?:Server version:|\\x00))[^\\r\\n]*?(?P<version>\\d+\\.\\d+\\.\\d+[\\w.-]*)",
+      "description": "MySQL/MariaDB handshake"
+    },
+    {
+      "id": "postgresql",
+      "service": "postgresql",
+      "pattern": "(?i)(?:the server does not support SSL|PostgreSQL|SFATAL|FATAL)",
+      "description": "PostgreSQL SSL negotiation reply"
+    },
+    {
+      "id": "postgresql-version-error",
+      "service": "postgresql",
+      "pattern": "(?i)(?:server_version|unsupported frontend protocol)",
+      "description": "PostgreSQL version detail"
+    },
+    {
+      "id": "redis",
+      "service": "redis",
+      "pattern": "^\\+PONG|^-NOAUTH|^-ERR.*(?P<product>Redis)|^(?:\\$\\d+\\r?\\n)?(?P<version>\\d+\\.\\d+[\\d.]*)\\r?\\n",
+      "description": "Redis PING/INFO reply"
+    },
+    {
+      "id": "redis-info",
+      "service": "redis",
+      "pattern": "(?i)redis_version:(?P<version>[\\d.]+)",
+      "description": "Redis INFO version"
+    },
+    {
+      "id": "memcached",
+      "service": "memcached",
+      "pattern": "^VERSION\\s+(?P<version>[\\d.]+)",
+      "description": "Memcached VERSION reply"
+    },
+    {
+      "id": "smb-smb1",
+      "service": "smb",
+      "pattern": "(?i)(?:NT LM 0\\.12|SMB|Windows 5\\.1|Windows 5\\.0)",
+      "description": "SMB negotiation bytes"
+    },
+    {
+      "id": "rdp",
+      "service": "rdp",
+      "pattern": "^\\x03\\x00\\x00",
+      "description": "RDP TPKT connection confirm"
+    },
+    {
+      "id": "vnc",
+      "service": "vnc",
+      "pattern": "(?i)^RFB\\s+(?P<version>[\\d.]+)",
+      "description": "VNC / RFB protocol"
+    },
+    {
+      "id": "telnet-generic",
+      "service": "telnet",
+      "pattern": "(?im)^\\s*(?:[\\w.@-]+\\s+){0,4}(?:login|username|password)\\s*:\\s*$|(?i:\\btelnet\\b)",
+      "description": "Telnet interactive login prompt (deliberately narrow)"
+    },
+    {
+      "id": "mongodb",
+      "service": "mongodb",
+      "pattern": "(?i)(?:ismaster|isWritablePrimary|maxWireVersion)",
+      "description": "MongoDB hello reply"
+    },
+    {
+      "id": "elasticsearch",
+      "service": "elasticsearch",
+      "pattern": "(?i)(?:\"cluster_name\"|you know, for search)",
+      "description": "Elasticsearch HTTP API"
+    },
+    {
+      "id": "zookeeper",
+      "service": "zookeeper",
+      "pattern": "(?i)(?:Zookeeper|ZooKeeper)",
+      "description": "ZooKeeper"
+    },
+    {
+      "id": "docker-api",
+      "service": "docker",
+      "pattern": "(?i)ApiVersion",
+      "description": "Docker Engine API"
+    },
+    {
+      "id": "kubernetes-api",
+      "service": "kubernetes",
+      "pattern": "(?i)(?:\"kind\":\"APIVersions\"|\"versions\":\\[\"v1\")",
+      "description": "Kubernetes API server"
+    }
+  ]
+}
