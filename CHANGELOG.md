@@ -49,6 +49,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 - `tests/conftest.py` fixture servers now keep connections open long enough for a
   clean EOF, instead of racing the client into a reset.
 
+### CI
+- Actions pinned to current majors (`checkout@v7`, `setup-python@v7`,
+  `upload-artifact@v7`, `setup-buildx-action@v4`, `build-push-action@v7`) to clear the
+  Node.js 20 deprecation warnings.
+
 ### Known limitations
 - TCP only (`SYN`/UDP scanning is out of scope for the asyncio socket model).
 - A silent host is reported as `filtered` only when the connect attempt times out;
