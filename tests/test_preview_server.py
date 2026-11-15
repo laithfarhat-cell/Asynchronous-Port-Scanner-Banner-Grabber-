@@ -16,6 +16,7 @@ import pytest
 from scripts.preview_server import (
     CONSOLE_BUILD,
     PreviewHandler,
+    active_asset,
     active_json,
     active_report,
     render_index,
@@ -69,6 +70,19 @@ class TestRender:
     def test_report_sources_resolve(self):
         assert active_report() is not None and active_report().is_file()
         assert active_json() is not None and active_json().is_file()
+
+    @pytest.mark.parametrize("kind", ["html", "json", "csv"])
+    def test_every_asset_has_a_committed_fallback(self, kind):
+        """CI checks out a clean tree where gitignored reports/ does not exist.
+
+        Each format must therefore resolve to *some* file without running
+        scripts/demo_lab.py first — the CSV route once 404'd here.
+        """
+        from scripts.preview_server import SAMPLE_ASSETS
+
+        assert SAMPLE_ASSETS[kind].is_file(), f"missing committed sample for {kind!r}"
+        resolved = active_asset(kind)
+        assert resolved is not None and resolved.is_file()
 
 
 class TestRoutes:
