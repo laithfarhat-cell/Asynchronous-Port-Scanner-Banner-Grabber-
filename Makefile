@@ -4,7 +4,7 @@ PY ?= python3
 VENV ?= .venv
 BIN := $(VENV)/bin
 
-.PHONY: help venv install dev test lint fmt scan preview check-preview docker clean
+.PHONY: help venv install dev test lint fmt scan preview check-preview verify-clean docker clean
 
 help: ## Show available targets
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-10s\033[0m %s\n", $$1, $$2}'
@@ -32,6 +32,9 @@ scan: ## Local demo scan against the loopback interface
 
 preview: ## Serve the local console (demo findings, signatures, CLI help) on :32929
 	$(BIN)/python -u scripts/preview_server.py --host 0.0.0.0 --port 32929
+
+verify-clean: ## Run the suite from a pristine git-archive checkout (what CI does)
+	./scripts/verify_clean_clone.sh
 
 check-preview: ## Verify the console on :32929 is up and running the current build
 	$(BIN)/python scripts/check_preview.py --port 32929

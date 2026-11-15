@@ -37,7 +37,19 @@ jobs:
       - name: Lint
         run: ruff check .
       - name: Test
-        run: pytest -q
+        # Always produce a JUnit report so a failure can be annotated below,
+        # even though this step itself is what fails the job.
+        run: pytest -q --junitxml=pytest-report.xml
+      - name: Annotate test failures
+        if: failure()
+        run: python scripts/ci_annotate.py pytest-report.xml
+      - name: Upload test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: junit-py${{ matrix.python }}-${{ matrix.os }}
+          path: pytest-report.xml
+          if-no-files-found: ignore
       - name: Smoke test the CLI entry point
         run: |
           asynscan --version

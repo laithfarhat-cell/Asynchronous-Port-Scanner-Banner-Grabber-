@@ -522,6 +522,18 @@ CI (`.github/workflows/ci.yml`) runs ruff + the full suite on Python 3.10–3.13
 (Ubuntu and macOS), builds the wheel/sdist, installs the wheel in a clean venv,
 exercises the `asynscan` entry point and builds the Docker image.
 
+Two guards keep "green locally, red in CI" from happening:
+
+```bash
+make verify-clean        # runs the suite from a git-archive checkout (no reports/, no caches)
+make check-preview       # is the local console up and on the current build?
+```
+
+`scripts/verify_clean_clone.sh` exists because a previous test depended on
+`reports/demo.csv`, a **gitignored** artifact: it passed locally and 404'd on every CI
+runner. CI also exports JUnit results (`scripts/ci_annotate.py`), so a failing test name
+appears directly on the pull request instead of a bare exit code.
+
 The test suite spins up real ephemeral asyncio servers (SSH-like, HTTP, Redis, TLS, silent) on
 loopback, so it needs no network access and no privileged ports. TLS tests generate a throwaway
 certificate with the `openssl` CLI and skip if it is unavailable.
